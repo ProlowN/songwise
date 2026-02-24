@@ -1,0 +1,40 @@
+{
+  "name": "songwise",
+  "version": "0.1.0",
+  "description": "CLI tool for managing Apple Music libraries",
+  "type": "module",
+  "bin": {
+    "songwise": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "darwin"
+  ],
+  "license": "MIT",
+  "author": "Magnus Edenberg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ProlowN/songwise.git"
+  },
+  "keywords": ["apple-music", "cli", "macos", "music", "playlist", "library"],
+  "files": ["dist"],
+  "dependencies": {
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
+  }
+}
