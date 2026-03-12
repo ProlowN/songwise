@@ -21,12 +21,24 @@ async function requireClient(): Promise<AppleMusicClient> {
   return new AppleMusicClient(tokens.developerToken, tokens.musicUserToken);
 }
 
-async function listPlaylists(): Promise<void> {
+async function listPlaylists(opts: { json?: boolean }): Promise<void> {
   const client = await requireClient();
   const playlists = await client.getAll<LibraryPlaylist>(
     "/v1/me/library/playlists",
     { limit: "100" },
   );
+
+  if (opts.json) {
+    console.log(JSON.stringify({
+      total: playlists.length,
+      playlists: playlists.map((pl) => ({
+        id: pl.id,
+        name: pl.attributes.name,
+        description: pl.attributes.description?.standard ?? null,
+      })),
+    }));
+    return;
+  }
 
   if (playlists.length === 0) {
     console.log("No playlists in library.");
@@ -43,7 +55,7 @@ async function listPlaylists(): Promise<void> {
 
 async function createPlaylist(
   name: string,
-  opts: { description?: string },
+  opts: { description?: string; json?: boolean },
 ): Promise<void> {
   const client = await requireClient();
   const body = {
@@ -64,6 +76,16 @@ async function createPlaylist(
   } catch {
     // POST succeeded but response body was not parseable — not a failure
   }
+
+  if (opts.json) {
+    console.log(JSON.stringify({
+      ok: true,
+      id: pl?.id ?? null,
+      name,
+    }));
+    return;
+  }
+
   if (pl) {
     console.log(`Created playlist "${name}" (${pl.id})`);
   } else {
@@ -71,20 +93,40 @@ async function createPlaylist(
   }
 }
 
-async function deletePlaylist(id: string): Promise<void> {
+async function deletePlaylist(id: string, opts: { json?: boolean }): Promise<void> {
   validateId(id, "playlist ID");
   const client = await requireClient();
   await client.delete(`/v1/me/library/playlists/${id}`);
-  console.log(`Deleted playlist ${id}`);
+  if (opts.json) {
+    console.log(JSON.stringify({ ok: true, id }));
+  } else {
+    console.log(`Deleted playlist ${id}`);
+  }
 }
 
-async function listTracks(id: string): Promise<void> {
+async function listTracks(id: string, opts: { json?: boolean }): Promise<void> {
   validateId(id, "playlist ID");
   const client = await requireClient();
   const tracks = await client.getAll<LibrarySong>(
     `/v1/me/library/playlists/${id}/tracks`,
     { limit: "100" },
   );
+
+  if (opts.json) {
+    console.log(JSON.stringify({
+      playlistId: id,
+      total: tracks.length,
+      tracks: tracks.map((t, i) => ({
+        position: i + 1,
+        id: t.id,
+        name: t.attributes.name,
+        artistName: t.attributes.artistName,
+        albumName: t.attributes.albumName,
+        durationInMillis: t.attributes.durationInMillis,
+      })),
+    }));
+    return;
+  }
 
   if (tracks.length === 0) {
     console.log("No tracks in this playlist.");
@@ -103,7 +145,7 @@ async function listTracks(id: string): Promise<void> {
 async function addTrack(
   playlistId: string,
   songId: string,
-  opts: { type?: string },
+  opts: { type?: string; json?: boolean },
 ): Promise<void> {
   validateId(playlistId, "playlist ID");
   validateId(songId, "song ID");
@@ -114,13 +156,17 @@ async function addTrack(
     data: [{ type: trackType, id: songId }],
   });
 
-  console.log(`Added ${songId} to playlist ${playlistId}`);
+  if (opts.json) {
+    console.log(JSON.stringify({ ok: true, playlistId, songId }));
+  } else {
+    console.log(`Added ${songId} to playlist ${playlistId}`);
+  }
 }
 
 async function removeTrack(
   playlistId: string,
   songId: string,
-  opts: { type?: string },
+  opts: { type?: string; json?: boolean },
 ): Promise<void> {
   validateId(playlistId, "playlist ID");
   validateId(songId, "song ID");
@@ -131,7 +177,11 @@ async function removeTrack(
     mode: "all",
   });
 
-  console.log(`Removed ${songId} from playlist ${playlistId}`);
+  if (opts.json) {
+    console.log(JSON.stringify({ ok: true, playlistId, songId }));
+  } else {
+    console.log(`Removed ${songId} from playlist ${playlistId}`);
+  }
 }
 
 export function registerPlaylistCommands(program: Command): void {
@@ -142,22 +192,26 @@ export function registerPlaylistCommands(program: Command): void {
   playlist
     .command("list")
     .description("List all playlists")
+    .option("--json", "Output as JSON")
     .action(listPlaylists);
 
   playlist
     .command("create <name>")
     .description("Create a new playlist")
     .option("-d, --description <text>", "Playlist description")
+    .option("--json", "Output as JSON")
     .action(createPlaylist);
 
   playlist
     .command("delete <id>")
     .description("Delete a playlist")
+    .option("--json", "Output as JSON")
     .action(deletePlaylist);
 
   playlist
     .command("tracks <id>")
     .description("List tracks in a playlist")
+    .option("--json", "Output as JSON")
     .action(listTracks);
 
   playlist
@@ -168,6 +222,7 @@ export function registerPlaylistCommands(program: Command): void {
       "Track type (library-songs or songs)",
       "library-songs",
     )
+    .option("--json", "Output as JSON")
     .action(addTrack);
 
   playlist
@@ -178,5 +233,6 @@ export function registerPlaylistCommands(program: Command): void {
       "Track type (library-songs or songs)",
       "library-songs",
     )
+    .option("--json", "Output as JSON")
     .action(removeTrack);
 }

@@ -20,11 +20,15 @@ async function requireClient(): Promise<AppleMusicClient> {
   return new AppleMusicClient(tokens.developerToken, tokens.musicUserToken);
 }
 
-async function removeSong(id: string): Promise<void> {
+async function removeSong(id: string, opts: { json?: boolean }): Promise<void> {
   validateId(id, "song ID");
   const client = await requireClient();
   await client.delete(`/v1/me/library/songs/${id}`);
-  console.log(`Removed song ${id} from library`);
+  if (opts.json) {
+    console.log(JSON.stringify({ ok: true, id }));
+  } else {
+    console.log(`Removed song ${id} from library`);
+  }
 }
 
 export function registerSongCommands(program: Command): void {
@@ -33,5 +37,6 @@ export function registerSongCommands(program: Command): void {
   song
     .command("remove <id>")
     .description("Remove a song from your library")
+    .option("--json", "Output as JSON")
     .action(removeSong);
 }
