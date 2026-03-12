@@ -158,8 +158,35 @@ function promptInput(prompt: string): Promise<string> {
   });
 }
 
-async function status(): Promise<void> {
+async function status(opts: { json?: boolean }): Promise<void> {
   const tokenStatus = getTokenStatus();
+
+  if (opts.json) {
+    if (!tokenStatus.hasUserToken) {
+      console.log(JSON.stringify({ authenticated: false }));
+      return;
+    }
+    const tokens = await getTokens();
+    let valid = false;
+    let error: string | undefined;
+    if (tokens) {
+      const result = await validateTokens(tokens.developerToken, tokens.musicUserToken);
+      valid = result.valid;
+      error = result.error;
+    }
+    console.log(JSON.stringify({
+      authenticated: true,
+      developerToken: {
+        present: tokenStatus.hasDeveloperToken,
+        expired: tokenStatus.devTokenExpired,
+        expiry: tokenStatus.devTokenExpiry?.toISOString() ?? null,
+      },
+      musicUserToken: { present: true },
+      valid,
+      ...(error ? { error } : {}),
+    }));
+    return;
+  }
 
   if (!tokenStatus.hasUserToken) {
     console.log("Status: Not authenticated");
@@ -193,9 +220,13 @@ async function status(): Promise<void> {
   }
 }
 
-function logout(): void {
+function logout(opts: { json?: boolean }): void {
   clearTokens();
-  console.log("Tokens cleared from Keychain.");
+  if (opts.json) {
+    console.log(JSON.stringify({ ok: true }));
+  } else {
+    console.log("Tokens cleared from Keychain.");
+  }
 }
 
 export function registerAuthCommands(program: Command): void {
@@ -216,10 +247,12 @@ export function registerAuthCommands(program: Command): void {
   auth
     .command("status")
     .description("Check authentication status")
+    .option("--json", "Output as JSON")
     .action(status);
 
   auth
     .command("logout")
     .description("Clear stored tokens")
+    .option("--json", "Output as JSON")
     .action(logout);
 }
