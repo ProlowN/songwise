@@ -15,7 +15,7 @@ function validateId(id: string, label: string): void {
 async function requireClient(): Promise<AppleMusicClient> {
   const tokens = await getTokens();
   if (!tokens) {
-    console.error("Not authenticated. Run: songwise auth login");
+    console.error("Not authenticated. Run: songwise auth login --manual");
     process.exit(1);
   }
   return new AppleMusicClient(tokens.developerToken, tokens.musicUserToken);

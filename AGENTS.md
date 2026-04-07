@@ -23,7 +23,7 @@ Content-Type: application/json
 ```
 
 Developer token is scraped automatically from the Apple Music web player.
-Music User Token is obtained via browser-based auth flow (user pastes a one-liner in browser console).
+Music User Token is obtained via `songwise auth login --manual` (recommended: user runs a one-liner in the browser console and pastes the result) or via the browser callback flow (`songwise auth login`).
 
 ## Project Structure
 
@@ -47,7 +47,7 @@ src/
 ## Key Design Decisions
 
 - **macOS only** — uses `security` CLI for Keychain, `open` for browser
-- **No cookies needed** — confirmed: three headers are sufficient
+- **No cookies needed** — confirmed: four headers are sufficient (Authorization, Music-User-Token, Origin, Content-Type)
 - **Origin header required** — hardcoded to `https://music.apple.com`
 - **No PUT/PATCH** — reorder not available, rename unverified
 - **Rate limiting** — retry once on 429

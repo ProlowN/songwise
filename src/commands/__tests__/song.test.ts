@@ -138,7 +138,7 @@ describe("song commands", () => {
       ).rejects.toThrow("process.exit(1)");
 
       expect(errorSpy).toHaveBeenCalledWith(
-        "Not authenticated. Run: songwise auth login",
+        "Not authenticated. Run: songwise auth login --manual",
       );
       expect(mockDelete).not.toHaveBeenCalled();
     });

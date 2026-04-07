@@ -114,7 +114,7 @@ export async function getTokens(): Promise<StoredTokens | null> {
         const msg = err instanceof Error ? err.message : String(err);
         throw new Error(
           `Developer token is missing and could not be refreshed: ${msg}\n` +
-            "Run: songwise auth login",
+            "Run: songwise auth login --manual",
         );
       }
       console.error(

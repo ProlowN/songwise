@@ -2,12 +2,23 @@
 
 macOS CLI for managing Apple Music libraries. Requires Node.js 18+ and an Apple Music subscription.
 
-This README is for AI agents and LLMs. It documents how to create a skill that wraps this CLI.
-
 ## Install
 
+The package is not published on npm. Install directly from the repository:
+
 ```bash
-npm install -g songwise
+git clone https://github.com/ProlowN/songwise.git
+cd songwise
+npm install
+npm run build
+npm link        # makes `songwise` available globally
+```
+
+To upgrade later, pull and rebuild:
+
+```bash
+git pull
+npm run build
 ```
 
 ## Auth setup
@@ -127,8 +138,8 @@ triggers:
   - library songs
   - music library
 prerequisites:
-  - songwise must be installed (npm install -g songwise)
-  - user must have run `songwise auth login` at least once
+  - songwise must be installed (see README Install section — git clone + npm link)
+  - user must have run `songwise auth login --manual` at least once
   - macOS only
 ```
 
@@ -171,12 +182,12 @@ LIMITATIONS:
 - No playlist rename (unverified API endpoint)
 - No track reordering (no API endpoint exists)
 - Reorder workaround: create new playlist, add tracks in desired order, delete old playlist
-- Music user tokens are believed to last several months (Apple does not document exact expiry) — if commands fail with auth errors, re-run songwise auth login
+- Music user tokens are believed to last several months (Apple does not document exact expiry) — if commands fail with auth errors, re-run songwise auth login --manual
 
 ERROR HANDLING:
 - All errors print to stderr with actionable messages
 - Exit code 0 = success, 1 = failure
-- Common errors: "Not authenticated" → run auth login, "Rate limited" → wait and retry
+- Common errors: "Not authenticated" → run songwise auth login --manual, "Rate limited" → wait and retry
 ```
 
 ### MCP server integration (optional)

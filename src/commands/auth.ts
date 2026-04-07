@@ -163,7 +163,7 @@ async function status(): Promise<void> {
 
   if (!tokenStatus.hasUserToken) {
     console.log("Status: Not authenticated");
-    console.log("\nRun: songwise auth login");
+    console.log("\nRun: songwise auth login --manual");
     return;
   }
 
@@ -187,7 +187,7 @@ async function status(): Promise<void> {
       tokens.developerToken,
       tokens.musicUserToken,
     );
-    console.log(result.valid ? "OK" : `FAILED (${result.error}) — run: songwise auth login`);
+    console.log(result.valid ? "OK" : `FAILED (${result.error}) — run: songwise auth login --manual`);
   } else {
     console.log("FAILED — could not load tokens");
   }
