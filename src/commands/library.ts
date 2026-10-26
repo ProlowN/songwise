@@ -18,7 +18,7 @@ function formatDuration(ms: number): string {
   return `${min}:${sec.toString().padStart(2, "0")}`;
 }
 
-async function listSongs(opts: { limit?: string }): Promise<void> {
+async function listSongs(opts: { limit?: string; json?: boolean }): Promise<void> {
   const client = await requireClient();
   const limit = opts.limit ? parseInt(opts.limit, 10) : undefined;
   if (limit !== undefined && (isNaN(limit) || limit <= 0)) {
@@ -49,6 +49,21 @@ async function listSongs(opts: { limit?: string }): Promise<void> {
 
   const display = limit ? songs.slice(0, limit) : songs;
 
+  if (opts.json) {
+    console.log(JSON.stringify({
+      total: display.length,
+      songs: display.map((song) => ({
+        id: song.id,
+        name: song.attributes.name,
+        artistName: song.attributes.artistName,
+        albumName: song.attributes.albumName,
+        durationInMillis: song.attributes.durationInMillis,
+        trackNumber: song.attributes.trackNumber,
+      })),
+    }));
+    return;
+  }
+
   if (display.length === 0) {
     console.log("No songs in library.");
     return;
@@ -66,7 +81,7 @@ async function listSongs(opts: { limit?: string }): Promise<void> {
 
 async function searchLibrary(
   query: string,
-  opts: { type?: string; limit?: string },
+  opts: { type?: string; limit?: string; json?: boolean },
 ): Promise<void> {
   const client = await requireClient();
   const types = opts.type || "library-songs";
@@ -82,7 +97,30 @@ async function searchLibrary(
 
   const results = res.results;
   if (!results || Object.keys(results).length === 0) {
-    console.log(`No results for "${query}".`);
+    if (opts.json) {
+      console.log(JSON.stringify({ query, results: {} }));
+    } else {
+      console.log(`No results for "${query}".`);
+    }
+    return;
+  }
+
+  if (opts.json) {
+    const jsonResults: Record<string, Array<{ id: string; name: string; artistName?: string }>> = {};
+    for (const [type, group] of Object.entries(results)) {
+      jsonResults[type] = group.data.map((item) => {
+        const attr = item.attributes;
+        const entry: { id: string; name: string; artistName?: string } = {
+          id: item.id,
+          name: (attr as { name: string }).name,
+        };
+        if ("artistName" in attr) {
+          entry.artistName = attr.artistName as string;
+        }
+        return entry;
+      });
+    }
+    console.log(JSON.stringify({ query, results: jsonResults }));
     return;
   }
 
@@ -108,6 +146,7 @@ export function registerLibraryCommands(program: Command): void {
     .command("songs")
     .description("List songs in your library")
     .option("-l, --limit <n>", "Maximum number of songs to show")
+    .option("--json", "Output as JSON")
     .action(listSongs);
 
   library
@@ -119,5 +158,6 @@ export function registerLibraryCommands(program: Command): void {
       "library-songs",
     )
     .option("-l, --limit <n>", "Maximum results", "10")
+    .option("--json", "Output as JSON")
     .action(searchLibrary);
 }
