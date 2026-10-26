@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import { program } from "commander";
 import { registerAuthCommands } from "./commands/auth.js";
 import { registerLibraryCommands } from "./commands/library.js";

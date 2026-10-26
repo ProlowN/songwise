@@ -354,7 +354,7 @@ describe("getTokens", () => {
     });
     mockedScrapeDevToken.mockRejectedValue(new Error("Network error"));
 
-    await expect(getTokens()).rejects.toThrow(/Run: songwise auth login/);
+    await expect(getTokens()).rejects.toThrow(/Run: songwise auth login --manual/);
   });
 
   it("falls back to expired token with console warning when scrape fails but expired token exists", async () => {

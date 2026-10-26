@@ -10,8 +10,21 @@ Minimal CLI for managing Apple Music playlists. Built for AI agents — clean ou
 
 ## Install
 
+The package is not published on npm. Install from the repository:
+
 ```bash
-npm install -g songwise
+git clone https://github.com/ProlowN/songwise.git
+cd songwise
+npm install
+npm run build
+npm link
+```
+
+To upgrade later, pull and rebuild:
+
+```bash
+git pull
+npm run build
 ```
 
 ## Auth Setup

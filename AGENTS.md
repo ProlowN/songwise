@@ -12,8 +12,14 @@
 
 ## Quick Start
 
+Not published on npm. Clone, build, and link:
+
 ```bash
-npm install -g songwise
+git clone https://github.com/ProlowN/songwise.git
+cd songwise
+npm install
+npm run build
+npm link
 songwise auth login --manual   # Required before any command
 songwise playlist list
 songwise playlist create "My Playlist"
