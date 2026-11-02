@@ -14,7 +14,7 @@
     "test:watch": "vitest"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "os": [
     "darwin"
@@ -28,13 +28,13 @@
   "keywords": ["apple-music", "cli", "macos", "music", "playlist", "library"],
   "files": ["dist"],
   "dependencies": {
-    "commander": "^13.0.0"
+    "commander": "^14.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "tsup": "^8.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.12"
   }
 }
