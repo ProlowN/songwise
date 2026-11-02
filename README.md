@@ -5,7 +5,7 @@ Minimal CLI for managing Apple Music playlists. Built for AI agents — clean ou
 ## Requirements
 
 - macOS
-- Node.js 18+
+- Node.js 20+
 - Apple Music subscription
 
 ## Install
